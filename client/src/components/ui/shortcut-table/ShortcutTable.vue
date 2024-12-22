@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ref, onMounted } from 'vue'
 import { shortcutApi } from '@/lib/api'
 
 interface Shortcut {
@@ -10,10 +10,25 @@ interface Shortcut {
   key: string
 }
 
+const props = defineProps<{
+  searchQuery: string
+}>()
+
 const shortcuts = ref<Shortcut[]>([])
 const newShortcut = ref<Shortcut>({
   description: '',
   key: ''
+})
+
+// Filtered shortcuts based on search query
+const filteredShortcuts = computed(() => {
+  if (!props.searchQuery) return shortcuts.value
+
+  const query = props.searchQuery.toLowerCase()
+  return shortcuts.value.filter(shortcut =>
+    shortcut.description.toLowerCase().includes(query) ||
+    shortcut.key.toLowerCase().includes(query)
+  )
 })
 
 const loadShortcuts = async () => {
@@ -80,7 +95,7 @@ onMounted(loadShortcuts)
           </tr>
         </thead>
         <tbody>
-          <tr v-for="shortcut in shortcuts"
+          <tr v-for="shortcut in filteredShortcuts"
               :key="shortcut.id"
               class="border-b transition-colors hover:bg-muted/50">
             <td class="p-4">{{ shortcut.description }}</td>
@@ -99,9 +114,9 @@ onMounted(loadShortcuts)
               </Button>
             </td>
           </tr>
-          <tr v-if="shortcuts.length === 0">
+          <tr v-if="filteredShortcuts.length === 0">
             <td colspan="3" class="p-4 text-center text-muted-foreground">
-              No shortcuts added yet.
+              {{ shortcuts.length === 0 ? 'No shortcuts added yet.' : 'No shortcuts match your search.' }}
             </td>
           </tr>
         </tbody>

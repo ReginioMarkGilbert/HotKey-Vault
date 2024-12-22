@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import ShortcutTable from '@/components/ui/shortcut-table/ShortcutTable.vue'
+import { Search } from 'lucide-vue-next'
+
+const searchQuery = ref('')
 </script>
 
 <template>
@@ -15,8 +20,20 @@ import ShortcutTable from '@/components/ui/shortcut-table/ShortcutTable.vue'
       <Button>Save Changes</Button>
     </div>
 
+    <!-- Search section -->
+    <div class="flex items-center space-x-2">
+      <div class="relative flex-1 max-w-sm">
+        <Search class="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          v-model="searchQuery"
+          class="pl-8"
+          placeholder="Search shortcuts..."
+        />
+      </div>
+    </div>
+
     <div class="rounded-lg border bg-card p-8">
-      <ShortcutTable />
+      <ShortcutTable :search-query="searchQuery" />
     </div>
   </div>
 </template>
